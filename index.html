@@ -26,8 +26,8 @@
     <p class="lead">We simulate a uniform-in-time Bernoulli approximation of a Poisson counting process using n small subintervals of [0, T].</p>
 
     <div class="card">
-      <h2>1. Simulation Setup</h2>
-      <p>We approximate the process by dividing the interval <code>T = 1</code> into <code>n</code> subintervals. In each subinterval an event occurs with probability <code>λ/n</code>. This yields a discrete process:</p>
+      <h2>1. Simulation Framework</h2>
+      <p>To approximate a continuous-time counting process, specifically a Poisson process with rate <code>λ</code>, we partition the observation window <code>[0, T]</code> with <code>T = 1</code> into <code>n</code> equally sized subintervals. Within each subinterval we generate a Bernoulli random variable that indicates whether an event occurs. The event probability per subinterval is set to <code>λ/n</code>, ensuring that the overall expected number of events remains λ. This procedure is a classical discrete approximation to a Poisson process derived from the limit of rare events.</p>
 
       <div>
         <label>λ (rate): <input id="lambda" type="number" value="8" step="0.1"/></label><br/>
@@ -36,41 +36,40 @@
         <p id="countResult" class="result"></p>
       </div>
 
-      <canvas id="pathChart"></canvas>
+      <canvas id="pathChart"></canvas> id="pathChart"></canvas>
     </div>
 
     <div class="card">
-      <h2>2. What process does this approximate?</h2>
-      <p>This construction is a classical approximation of a <strong>Poisson process</strong> with rate parameter <strong>λ</strong>. A Poisson process <code>{N(t) : t ≥ 0}</code> satisfies:</p>
+      <h2>2. Limiting Process and Convergence Justification</h2>
+      <p>The Bernoulli construction above converges, in distribution, to a <strong>Poisson process</strong> as <code>n → ∞</code>. Formally, if we let <code>N_n(t)</code> denote the cumulative number of Bernoulli events by time <code>t</code>, then the sequence of processes <code>{N_n(t)}</code> converges to <code>{N(t)}</code>, where <code>{N(t)}</code> is a Poisson process with rate λ. Specifically:</p>
       <ul>
-        <li><strong>Independent increments:</strong> counts in disjoint intervals are independent.</li>
-        <li><strong>Stationary increments:</strong> the number of events in an interval length h follows <code>Poisson(λh)</code>.</li>
-        <li><strong>Almost surely right-continuous, non-decreasing, integer-valued paths.</strong></li>
+        <li><strong>Convergence of finite-dimensional distributions:</strong> For each fixed <code>t</code>, <code>N_n(t)</code> converges to a <code>Poisson(λt)</code> random variable.</li>
+        <li><strong>Independent increments emerge in the limit:</strong> The Bernoulli trials in disjoint intervals are independent, and their aggregated limits preserve this independence.</li>
+        <li><strong>Stationary increments:</strong> Since each subinterval is treated uniformly, the limiting process inherits constant-rate increments.</li>
       </ul>
-      <p>When we divide the interval into <code>n</code> small pieces and place an event with probability <code>λ/n</code>, the resulting total count is approximately <code>Poisson(λ)</code> for large n.</p>
-    </div>
+      <p>Thus, the simulation is not merely heuristic—it is a discretization that reflects the formal rare-event derivation of the Poisson process.</p>
 
     <div class="card">
-      <h2>3. Theoretical Properties</h2>
+      <h2>3. Theoretical Properties of the Poisson Counting Process</h2>
+      <p>Once the discrete simulation converges to its continuous counterpart, the resulting stochastic process satisfies the defining characteristics of a Poisson process. These include:</p>
       <ul>
-        <li><strong>Distribution of N(t):</strong> <code>N(t) ~ Poisson(λt)</code>.</li>
-        <li><strong>Interarrival times:</strong> Exponentially distributed with mean <code>1/λ</code>.</li>
-        <li><strong>Memorylessness:</strong> The exponential waiting-time distribution is memoryless.</li>
-        <li><strong>Expectation:</strong> <code>E[N(t)] = λt</code>.</li>
-        <li><strong>Variance:</strong> <code>Var(N(t)] = λt</code> (equidispersion).</li>
+        <li><strong>Distribution of counts:</strong> For any <code>t ≥ 0</code>, the number of events follows <code>Poisson(λt)</code>.</li>
+        <li><strong>Expectation and variance:</strong> <code>E[N(t)] = Var[N(t)] = λt</code>, reflecting equidispersion.</li>
+        <li><strong>Sample-path behavior:</strong> Paths are almost surely right-continuous, integer-valued, and exhibit jumps of size one.</li>
+        <li><strong>Interarrival times:</strong> Differences between successive event times follow <code>Exponential(λ)</code>, a consequence of stationary and independent increments.</li>
       </ul>
-    </div>
+      <p>These properties make the Poisson process foundational in stochastic modeling, queueing theory, and applied probability.</p>
 
     <div class="card">
-      <h2>4. Meaning of λ (the rate parameter)</h2>
-      <p>The rate parameter λ has several equivalent interpretations:</p>
+      <h2>4. Interpretation of the Rate Parameter λ</h2>
+      <p>The rate parameter <code>λ</code> plays a central conceptual and mathematical role in the characterization of the Poisson process:</p>
       <ul>
-        <li>Expected number of events per unit time.</li>
-        <li>Inverse of the mean waiting time between events (<code>E[interarrival] = 1/λ</code>).</li>
-        <li>Controls steepness of the counting path: larger λ → more frequent jumps.</li>
-        <li>Sets the scale of randomness: variance is also λt, so fluctuations increase with λ.</li>
+        <li><strong>Intensity of events:</strong> It specifies the average number of events per unit time.</li>
+        <li><strong>Temporal scaling:</strong> A higher λ implies denser event occurrences and shorter expected waiting times.</li>
+        <li><strong>Link to exponential distribution:</strong> The mean interarrival time is <code>1/λ</code>, establishing λ as the inverse-timescale governing the process.</li>
+        <li><strong>Determinant of probabilistic variability:</strong> Since <code>Var[N(t)] = λt</code>, λ directly modulates the randomness inherent in the system.</li>
       </ul>
-    </div>
+      <p>In applications—ranging from photon arrivals in physics to call arrivals in telecommunications—λ embodies the fundamental rate at which stochastic events occur.</p>
 
   </div>
 
@@ -107,3 +106,4 @@
 
 </body>
 </html>
+
