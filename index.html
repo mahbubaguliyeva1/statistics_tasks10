@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Counting Process Simulation — Poisson Process Approximation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body{margin:0;background:#0b1220;font-family:Inter;color:#e8edf5;line-height:1.6}
+    .container{max-width:1100px;margin:auto;padding:32px}
+    h1{font-size:28px;margin-bottom:4px}
+    p.lead{color:#9aa4b2;margin-top:0;margin-bottom:24px}
+    .card{background:rgba(255,255,255,0.03);padding:20px;border-radius:16px;border:1px solid rgba(255,255,255,0.05);margin-bottom:24px}
+    code{background:#021226;padding:3px 6px;border-radius:6px;font-family:monospace}
+    button{background:#60a5fa;border:none;padding:10px 16px;border-radius:8px;font-weight:700;color:#06132b;cursor:pointer;margin-top:10px}
+    .result{font-weight:700;margin-top:10px;color:#60a5fa}
+    canvas{margin-top:18px;width:100%;max-width:700px;height:240px;background:#0a162a;border-radius:12px}
+    ul{margin-left:20px}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+
+    <h1>Simulating a Counting Process with Rate λ</h1>
+    <p class="lead">We simulate a uniform-in-time Bernoulli approximation of a Poisson counting process using n small subintervals of [0, T].</p>
+
+    <div class="card">
+      <h2>1. Simulation Setup</h2>
+      <p>We approximate the process by dividing the interval <code>T = 1</code> into <code>n</code> subintervals. In each subinterval an event occurs with probability <code>λ/n</code>. This yields a discrete process:</p>
+
+      <div>
+        <label>λ (rate): <input id="lambda" type="number" value="8" step="0.1"/></label><br/>
+        <label>n (subintervals): <input id="nval" type="number" value="5000"/></label><br/>
+        <button onclick="runSim()">Run Simulation</button>
+        <p id="countResult" class="result"></p>
+      </div>
+
+      <canvas id="pathChart"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>2. What process does this approximate?</h2>
+      <p>This construction is a classical approximation of a <strong>Poisson process</strong> with rate parameter <strong>λ</strong>. A Poisson process <code>{N(t) : t ≥ 0}</code> satisfies:</p>
+      <ul>
+        <li><strong>Independent increments:</strong> counts in disjoint intervals are independent.</li>
+        <li><strong>Stationary increments:</strong> the number of events in an interval length h follows <code>Poisson(λh)</code>.</li>
+        <li><strong>Almost surely right-continuous, non-decreasing, integer-valued paths.</strong></li>
+      </ul>
+      <p>When we divide the interval into <code>n</code> small pieces and place an event with probability <code>λ/n</code>, the resulting total count is approximately <code>Poisson(λ)</code> for large n.</p>
+    </div>
+
+    <div class="card">
+      <h2>3. Theoretical Properties</h2>
+      <ul>
+        <li><strong>Distribution of N(t):</strong> <code>N(t) ~ Poisson(λt)</code>.</li>
+        <li><strong>Interarrival times:</strong> Exponentially distributed with mean <code>1/λ</code>.</li>
+        <li><strong>Memorylessness:</strong> The exponential waiting-time distribution is memoryless.</li>
+        <li><strong>Expectation:</strong> <code>E[N(t)] = λt</code>.</li>
+        <li><strong>Variance:</strong> <code>Var(N(t)] = λt</code> (equidispersion).</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>4. Meaning of λ (the rate parameter)</h2>
+      <p>The rate parameter λ has several equivalent interpretations:</p>
+      <ul>
+        <li>Expected number of events per unit time.</li>
+        <li>Inverse of the mean waiting time between events (<code>E[interarrival] = 1/λ</code>).</li>
+        <li>Controls steepness of the counting path: larger λ → more frequent jumps.</li>
+        <li>Sets the scale of randomness: variance is also λt, so fluctuations increase with λ.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    let chart=null;
+
+    function runSim(){
+      const λ = parseFloat(document.getElementById('lambda').value);
+      const n = parseInt(document.getElementById('nval').value);
+      const p = λ/n;
+      const dt = 1/n;
+
+      let count = 0;
+      const times = [0];
+      const path = [0];
+
+      for(let i=1;i<=n;i++){
+        if(Math.random() < p) count++;
+        times.push(i*dt);
+        path.push(count);
+      }
+
+      document.getElementById('countResult').innerText = "Total count N(1) = " + count;
+
+      if(chart) chart.destroy();
+      const ctx=document.getElementById('pathChart');
+      chart=new Chart(ctx,{
+        type:'line',
+        data:{ labels:times, datasets:[{ label:'Counting Path N(t)', data:path, stepped:true }]},
+        options:{ responsive:true, scales:{ x:{title:{display:true,text:'t'}}, y:{title:{display:true,text:'N(t)'}}}}
+      });
+    }
+  </script>
+
+</body>
+</html>
